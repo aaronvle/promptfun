@@ -43,15 +43,29 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 
 ## Status
 
-🚧 Early days — currently a fresh Next.js scaffold. Roadmap, roughly:
+🚧 The core game loop works. Roadmap:
 
-- [ ] Landing page with countdown-ish tease (without revealing the opening time)
-- [ ] Window scheduler + open/closed state
-- [ ] Prompt submission with first-come-first-served locking
-- [ ] OpenRouter fan-out
-- [ ] Supabase schema + persistence
+- [x] Landing page with countdown-ish tease (without revealing the opening time)
+- [x] Window scheduler + open/closed state (daily Vercel Cron fills upcoming 12h cycles)
+- [x] Prompt submission with first-come-first-served locking (atomic conditional claim)
+- [x] OpenRouter fan-out (needs `OPENROUTER_API_KEY`)
+- [x] Supabase schema + persistence
+- [x] Run page showing each model's response (`/runs/[id]`)
 - [ ] Public archive of past runs
 - [ ] Twitter/X bot with opt-in submitter tagging
+
+## Environment variables
+
+| Name | Where | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | client + server | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | Supabase publishable key |
+| `SUPABASE_SECRET_KEY` | server only | Supabase secret key — all writes and window reads |
+| `OPENROUTER_API_KEY` | server only | Model fan-out; without it, runs record an error per model |
+| `CRON_SECRET` | server only | Protects `/api/cron/schedule` (Vercel sends it automatically) |
+
+The `windows` table has no public read policy on purpose: future opening
+times must never be readable from the client, or the game breaks.
 
 ## Development
 
@@ -60,4 +74,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). To exercise the loop
+locally you need the Supabase env vars in `.env.local`; hit
+`/api/cron/schedule` once to create windows, and temporarily insert a
+window with `opens_at` in the past to force the open state.
