@@ -1,3 +1,4 @@
+import Link from "next/link";
 import WindowStatus from "@/components/WindowStatus";
 
 const MODELS = [
@@ -87,6 +88,13 @@ export default function Home() {
             ...and friends, via a single OpenRouter call.
           </p>
         </section>
+
+        <Link
+          href="/archive"
+          className="text-sm font-medium text-zinc-700 dark:text-zinc-300 underline-offset-4 hover:underline"
+        >
+          Browse past runs →
+        </Link>
       </main>
 
       <footer className="w-full border-t border-black/[.08] dark:border-white/[.145] py-8">
