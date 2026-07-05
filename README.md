@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# promptfun
 
-## Getting Started
+**One prompt. Every model. Once every 12 hours. First come, first served.**
 
-First, run the development server:
+promptfun is a fun little experiment in comparing AI models with *normal* prompts — the kind real people actually write — instead of benchmarks.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## How it works
+
+1. **The site opens at a random time, once every ~12 hours.** Nobody knows exactly when. If you want to be the one who gets to prompt, you have to be lurking (or set a reminder and get lucky).
+2. **First come, first served.** When the window opens, anyone on the internet who's on the site can write a prompt and hit send. The first submission claims it — then the window slams shut until the next random opening.
+3. **The prompt fans out to a handful of flagship models** (roughly 5–8: think Claude, GPT, Gemini, Llama, DeepSeek, Grok, Mistral...) via a single [OpenRouter](https://openrouter.ai) integration, all running the same prompt at the same time.
+4. **Every response is stored** in Supabase, building a living, ever-growing log of how models stack up against each other on everyday prompts.
+5. **A Twitter/X bot tweets each run as a thread** — the prompt, then every model's response — and tags the person who submitted the prompt, if they want the credit.
+
+The result: a slow-drip, community-driven model comparison log, with a little scarcity-driven game on top. People race to be *the* prompter of the cycle, and everyone else gets an honest look at how the models actually differ.
+
+## Why?
+
+Benchmarks measure what labs optimize for. promptfun logs what happens when a random person on the internet asks a random thing at a random time. That corpus — same prompt, many models, timestamped — gets more interesting the longer it runs.
+
+## Architecture (planned)
+
+| Piece | Choice |
+|---|---|
+| Web app | Next.js (App Router, TypeScript, Tailwind) — this repo |
+| Model fan-out | OpenRouter — one API, many models |
+| Storage | Supabase (prompts, responses, window schedule, submitter credits) |
+| Distribution | Twitter/X bot posting each run as a thread |
+| Window scheduling | Random opening time within each 12-hour cycle, server-side |
+
+### Rough flow
+
+```
+random timer fires ──▶ window opens ──▶ first user submits prompt
+                                              │
+                                              ▼
+                              OpenRouter fan-out to 5–8 models
+                                              │
+                                              ▼
+                          responses saved to Supabase ──▶ tweeted as a thread
+                                                          (submitter tagged, opt-in)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Status
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🚧 Early days — currently a fresh Next.js scaffold. Roadmap, roughly:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [ ] Landing page with countdown-ish tease (without revealing the opening time)
+- [ ] Window scheduler + open/closed state
+- [ ] Prompt submission with first-come-first-served locking
+- [ ] OpenRouter fan-out
+- [ ] Supabase schema + persistence
+- [ ] Public archive of past runs
+- [ ] Twitter/X bot with opt-in submitter tagging
 
-## Learn More
+## Development
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000).
