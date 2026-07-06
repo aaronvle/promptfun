@@ -40,12 +40,20 @@ export default async function RunPage(props: PageProps<"/runs/[id]">) {
     <div className="flex flex-1 flex-col items-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex w-full max-w-3xl flex-1 flex-col gap-10 px-6 py-16">
         <div className="flex flex-col gap-3">
-          <Link
-            href="/"
-            className="text-xs text-zinc-500 dark:text-zinc-400 underline-offset-4 hover:underline"
-          >
-            ← promptfun
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-xs text-zinc-500 dark:text-zinc-400 underline-offset-4 hover:underline"
+            >
+              ← promptfun
+            </Link>
+            <Link
+              href="/gallery"
+              className="text-xs text-zinc-500 dark:text-zinc-400 underline-offset-4 hover:underline"
+            >
+              gallery
+            </Link>
+          </div>
           <h1 className="text-xl font-semibold tracking-tight text-black dark:text-zinc-50">
             &ldquo;{run.prompt}&rdquo;
           </h1>
