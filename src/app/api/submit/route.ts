@@ -1,12 +1,11 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { getOpenWindow } from "@/lib/window";
 import { MODELS, PROMPT_MAX_LENGTH } from "@/lib/models";
+import { askModel } from "@/lib/openrouter";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Fan-out can take a while on slow models; give the function room.
 export const maxDuration = 60;
-
-const MODEL_TIMEOUT_MS = 45_000;
 
 interface SubmitBody {
   prompt?: string;
@@ -81,51 +80,15 @@ export async function POST(request: Request) {
 // Ask every model in the lineup at once; store each answer (or error) as
 // its own responses row so partial results still make it to the archive.
 async function fanOut(db: SupabaseClient, runId: string, prompt: string) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-
   await Promise.allSettled(
     MODELS.map(async ({ slug }) => {
-      const started = Date.now();
-      let output: string | null = null;
-      let errorMsg: string | null = null;
-
-      if (!apiKey) {
-        errorMsg = "OPENROUTER_API_KEY not configured";
-      } else {
-        try {
-          const res = await fetch(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: slug,
-                messages: [{ role: "user", content: prompt }],
-              }),
-              signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
-            }
-          );
-          if (!res.ok) {
-            errorMsg = `OpenRouter ${res.status}: ${(await res.text()).slice(0, 300)}`;
-          } else {
-            const json = await res.json();
-            output = json.choices?.[0]?.message?.content ?? null;
-            if (output === null) errorMsg = "empty completion";
-          }
-        } catch (err) {
-          errorMsg = err instanceof Error ? err.message : "request failed";
-        }
-      }
-
+      const result = await askModel(slug, prompt);
       await db.from("responses").insert({
         run_id: runId,
-        model: slug,
-        output,
-        error: errorMsg,
-        latency_ms: Date.now() - started,
+        model: result.model,
+        output: result.output,
+        error: result.error,
+        latency_ms: result.latency_ms,
       });
     })
   );
