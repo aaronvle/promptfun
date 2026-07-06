@@ -48,10 +48,10 @@ export default async function RunPage(props: PageProps<"/runs/[id]">) {
               ← promptfun
             </Link>
             <Link
-              href="/archive"
+              href="/gallery"
               className="text-xs text-zinc-500 dark:text-zinc-400 underline-offset-4 hover:underline"
             >
-              archive
+              gallery
             </Link>
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-black dark:text-zinc-50">

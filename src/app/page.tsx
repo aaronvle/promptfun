@@ -90,10 +90,10 @@ export default function Home() {
         </section>
 
         <Link
-          href="/archive"
+          href="/gallery"
           className="text-sm font-medium text-zinc-700 dark:text-zinc-300 underline-offset-4 hover:underline"
         >
-          Browse past runs →
+          Browse the gallery →
         </Link>
       </main>
 
