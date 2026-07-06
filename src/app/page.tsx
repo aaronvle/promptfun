@@ -1,5 +1,10 @@
 import Link from "next/link";
+import LastRun from "@/components/LastRun";
 import WindowStatus from "@/components/WindowStatus";
+
+// Refresh the prerendered homepage every minute so the latest run
+// shows up shortly after a window is won.
+export const revalidate = 60;
 
 const MODELS = [
   "Claude",
@@ -45,6 +50,8 @@ export default function Home() {
         </section>
 
         <WindowStatus />
+
+        <LastRun />
 
         <section className="flex w-full flex-col gap-6">
           <h2 className="text-sm font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400 text-center">
