@@ -62,6 +62,7 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | Supabase publishable key |
 | `SUPABASE_SECRET_KEY` | server only | Supabase secret key — all writes and window reads |
 | `OPENROUTER_API_KEY` | server only | Model fan-out; without it, runs record an error per model |
+| `NEXT_PUBLIC_SITE_URL` | optional | Sent as `HTTP-Referer` app attribution to OpenRouter |
 | `CRON_SECRET` | server only | Protects `/api/cron/schedule` (Vercel sends it automatically) |
 
 The `windows` table has no public read policy on purpose: future opening
