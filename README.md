@@ -64,9 +64,28 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 | `OPENROUTER_API_KEY` | server only | Model fan-out; without it, runs record an error per model |
 | `NEXT_PUBLIC_SITE_URL` | optional | Sent as `HTTP-Referer` app attribution to OpenRouter |
 | `CRON_SECRET` | server only | Protects `/api/cron/schedule` (Vercel sends it automatically) |
+| `RATE_LIMIT_SALT` | optional | Salts hashed IPs in `submit_attempts`; any random string |
 
 The `windows` table has no public read policy on purpose: future opening
 times must never be readable from the client, or the game breaks.
+
+### Rate limiting migration
+
+Submissions are limited to 5 per minute per IP (salted hash, raw IPs are
+never stored). Run this once in the Supabase SQL editor; until the table
+exists the limiter fails open and submissions work unguarded:
+
+```sql
+create table submit_attempts (
+  ip_hash text not null,
+  attempted_at timestamptz not null default now()
+);
+create index submit_attempts_by_ip_time
+  on submit_attempts (ip_hash, attempted_at desc);
+alter table submit_attempts enable row level security; -- no policies: server-only
+```
+
+Old attempts are pruned by the daily cron.
 
 ## Development
 
