@@ -1,19 +1,11 @@
 "use client";
 
-export interface DisplayResponse {
-  label: string;
-  latencySec: string | null;
-  text: string;
-  isError: boolean;
-}
-
 export default function Terminal({
   phase,
   prompt,
   onPromptChange,
   onSubmit,
   runPrompt,
-  responses,
   pending,
   notice,
   onReset,
@@ -23,7 +15,6 @@ export default function Terminal({
   onPromptChange: (v: string) => void;
   onSubmit: () => void;
   runPrompt: string;
-  responses: DisplayResponse[];
   pending: number;
   notice: string | null;
   onReset: () => void;
@@ -78,21 +69,8 @@ export default function Terminal({
           <div className="font-mono-space text-[13px] text-noir-text">
             &gt; &ldquo;{runPrompt}&rdquo;
           </div>
-          <div className="flex max-h-[150px] flex-col gap-[5px] overflow-y-auto">
-            {responses.map((r) => (
-              <div
-                key={r.label}
-                className="font-mono-space text-[11px] leading-[1.5] text-noir-body"
-              >
-                <span className="font-bold text-noir-red">
-                  [{r.label}
-                  {r.latencySec && ` ${r.latencySec}s`}]
-                </span>{" "}
-                <span className={r.isError ? "text-noir-faint" : undefined}>
-                  {r.text}
-                </span>
-              </div>
-            ))}
+          <div className="font-mono-space text-[10px] text-noir-faint">
+            responses land below as each model finishes ▾
           </div>
           {phase === "running" && (
             <div className="font-mono-space text-[10px] text-noir-muted">

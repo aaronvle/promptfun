@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { LatestRun } from "@/lib/runs";
 import { MODELS } from "@/lib/models";
+import ResponseCard from "./ResponseCard";
 
 function labelFor(slug: string) {
   return MODELS.find((m) => m.slug === slug)?.label ?? slug;
@@ -28,20 +29,21 @@ export default function LastRunPanel({ run }: { run: LatestRun }) {
       <div className="font-mono-space text-[13px] text-noir-text">
         &gt; &ldquo;{run.prompt}&rdquo;
       </div>
-      <div className="flex max-h-[190px] flex-col gap-[5px] overflow-y-auto">
+      <div className="flex flex-col gap-[10px]">
         {responses.map((r) => (
-          <div
+          <ResponseCard
             key={r.model}
-            className="font-mono-space text-[11px] leading-[1.5] text-noir-body"
-          >
-            <span className="font-bold text-noir-red">
-              [{labelFor(r.model)}
-              {r.latency_ms != null && ` ${(r.latency_ms / 1000).toFixed(1)}s`}]
-            </span>{" "}
-            {r.output ?? (
-              <span className="text-noir-faint">{r.error ?? "no output"}</span>
-            )}
-          </div>
+            r={{
+              label: labelFor(r.model),
+              slug: r.model,
+              latencySec:
+                r.latency_ms != null
+                  ? (r.latency_ms / 1000).toFixed(1)
+                  : null,
+              text: r.output ?? r.error ?? "no output",
+              isError: !r.output,
+            }}
+          />
         ))}
       </div>
       <Link
