@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MODELS, PROMPT_MAX_LENGTH } from "@/lib/models";
 import type { LatestRun } from "@/lib/runs";
 import ScrambledClock from "./ScrambledClock";
-import Terminal, { type DisplayResponse } from "./Terminal";
+import Terminal from "./Terminal";
+import ResponseCard, { type CardResponse } from "./ResponseCard";
 import SendButton from "./SendButton";
 import KnobRail from "./KnobRail";
 import HowPanel from "./HowPanel";
@@ -124,11 +125,12 @@ export default function Console({
   const lcdStatus =
     phase === "open" ? "OPEN — GO" : isRun ? "CLAIMED" : "CLOSED";
 
-  const displayResponses: DisplayResponse[] = (run?.responses ?? [])
+  const displayResponses: CardResponse[] = (run?.responses ?? [])
     .slice()
     .sort((a, b) => (a.latency_ms ?? Infinity) - (b.latency_ms ?? Infinity))
     .map((r) => ({
       label: labelFor(r.model),
+      slug: r.model,
       latencySec:
         r.latency_ms != null ? (r.latency_ms / 1000).toFixed(1) : null,
       text: r.output ?? r.error ?? "no output",
@@ -184,7 +186,6 @@ export default function Console({
           onPromptChange={(v) => setPrompt(v.slice(0, PROMPT_MAX_LENGTH))}
           onSubmit={submit}
           runPrompt={run?.prompt ?? prompt}
-          responses={displayResponses}
           pending={MODELS.length - (run?.responses.length ?? 0)}
           notice={notice}
           onReset={reset}
@@ -196,6 +197,15 @@ export default function Console({
           />
         </div>
       </div>
+
+      {/* live run responses: one readable card per model */}
+      {isRun && displayResponses.length > 0 && (
+        <div className="flex flex-col gap-[10px]">
+          {displayResponses.map((r) => (
+            <ResponseCard key={r.label} r={r} />
+          ))}
+        </div>
+      )}
 
       <KnobRail howOpen={howOpen} onToggleHow={() => setHowOpen((v) => !v)} />
 
