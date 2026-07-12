@@ -14,7 +14,7 @@ export default function MeterStrip({
   return (
     <div className="flex items-center gap-[18px] rounded-[10px] border border-noir-border-faint bg-noir-bg px-[18px] py-[10px] opacity-85">
       <span className="hidden whitespace-nowrap font-mono-space text-[9px] tracking-[2px] text-noir-faint sm:block">
-        7 MODELS
+        {meters.length} MODELS
         <br />
         ON THE LINE
       </span>

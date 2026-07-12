@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
-import { MODELS } from "@/lib/models";
+import { MODELS, labelFor } from "@/lib/models";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -12,9 +12,6 @@ interface ResponseRow {
   latency_ms: number | null;
 }
 
-function labelFor(slug: string) {
-  return MODELS.find((m) => m.slug === slug)?.label ?? slug;
-}
 
 export default async function RunPage(props: PageProps<"/runs/[id]">) {
   const { id } = await props.params;
