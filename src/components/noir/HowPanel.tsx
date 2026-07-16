@@ -23,7 +23,7 @@ const STEPS = [
 
 export default function HowPanel() {
   return (
-    <div className="grid grid-cols-1 gap-[10px] rounded-[10px] border border-noir-border bg-noir-bg p-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-[10px] rounded-[10px] border border-noir-border bg-noir-bg p-4 lg:grid-cols-2">
       {STEPS.map((s) => (
         <div
           key={s.num}
