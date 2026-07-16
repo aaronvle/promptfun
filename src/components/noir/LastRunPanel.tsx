@@ -1,11 +1,7 @@
 import Link from "next/link";
 import type { LatestRun } from "@/lib/runs";
-import { MODELS } from "@/lib/models";
+import { labelFor } from "@/lib/models";
 import ResponseCard from "./ResponseCard";
-
-function labelFor(slug: string) {
-  return MODELS.find((m) => m.slug === slug)?.label ?? slug;
-}
 
 // Noir-styled record of the most recent run, below the meter strip.
 export default function LastRunPanel({ run }: { run: LatestRun }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MODELS, PROMPT_MAX_LENGTH } from "@/lib/models";
+import { MODELS, PROMPT_MAX_LENGTH, labelFor } from "@/lib/models";
 import type { LatestRun } from "@/lib/runs";
 import ScrambledClock from "./ScrambledClock";
 import Terminal from "./Terminal";
@@ -16,10 +16,6 @@ const WINDOW_POLL_MS = 5000;
 const RUN_POLL_MS = 1500;
 
 type Phase = "closed" | "open" | "running" | "done";
-
-function labelFor(slug: string) {
-  return MODELS.find((m) => m.slug === slug)?.label ?? slug;
-}
 
 export default function Console({
   initialLastRun,
