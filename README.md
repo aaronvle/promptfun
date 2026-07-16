@@ -69,23 +69,15 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 The `windows` table has no public read policy on purpose: future opening
 times must never be readable from the client, or the game breaks.
 
-### Rate limiting migration
+## Database migrations
 
-Submissions are limited to 5 per minute per IP (salted hash, raw IPs are
-never stored). Run this once in the Supabase SQL editor; until the table
-exists the limiter fails open and submissions work unguarded:
-
-```sql
-create table submit_attempts (
-  ip_hash text not null,
-  attempted_at timestamptz not null default now()
-);
-create index submit_attempts_by_ip_time
-  on submit_attempts (ip_hash, attempted_at desc);
-alter table submit_attempts enable row level security; -- no policies: server-only
-```
-
-Old attempts are pruned by the daily cron.
+The schema lives in [`supabase/migrations/`](supabase/migrations/) as
+numbered SQL files — the source of truth for the database. There's no
+automated runner yet: apply new migrations by pasting them into the
+Supabase SQL editor (or `supabase db push` if you use the CLI). Applied
+so far: `0001` (initial schema). Pending for the rate limiter: `0002`
+(until it's applied, the limiter fails open and submissions work
+unguarded).
 
 ## Development
 
