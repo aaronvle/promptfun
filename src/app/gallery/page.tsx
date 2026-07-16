@@ -49,89 +49,99 @@ export default async function GalleryPage(props: PageProps<"/gallery">) {
   const runs = await getRuns(q);
 
   return (
-    <div className="flex flex-1 flex-col items-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-16">
-        <div className="flex flex-col gap-3">
-          <Link
-            href="/"
-            className="text-xs text-zinc-500 dark:text-zinc-400 underline-offset-4 hover:underline"
-          >
-            ← promptfun
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
-            The gallery
-          </h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Every prompt that ever won a window, and how every model answered.
-          </p>
-        </div>
-
-        <form action="/gallery" method="get" className="flex gap-2">
-          <input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Search past prompts..."
-            className="w-full rounded-xl border border-black/[.08] dark:border-white/[.145] bg-white dark:bg-zinc-950 px-4 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
-          />
-          <button
-            type="submit"
-            className="shrink-0 rounded-xl bg-zinc-900 dark:bg-zinc-100 px-5 py-2.5 text-sm font-medium text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
-          >
-            Search
-          </button>
-        </form>
-
-        {q && runs !== null && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {runs.length}
-            {runs.length === 50 ? "+" : ""} result{runs.length === 1 ? "" : "s"}{" "}
-            for &ldquo;{q}&rdquo; ·{" "}
+    <div className="flex flex-1 justify-center bg-noir-bg px-4 py-[34px] sm:px-[34px]">
+      <main className="w-full max-w-[960px]">
+        <div className="flex flex-col gap-5 rounded-2xl border-2 border-noir-border bg-noir-panel px-5 py-7 sm:px-[30px]">
+          {/* header */}
+          <div className="flex flex-col gap-1">
             <Link
-              href="/gallery"
-              className="underline-offset-4 hover:underline"
+              href="/"
+              className="font-mono-space text-[10px] tracking-[1px] text-noir-muted hover:text-noir-text"
             >
-              clear
+              ← promptfun
             </Link>
-          </p>
-        )}
+            <span className="font-bebas text-[34px] leading-[.95] tracking-[2px] text-noir-text">
+              THE <span className="text-noir-red">GALLERY</span>
+            </span>
+            <span className="font-mono-space text-[9px] tracking-[3px] text-noir-muted">
+              EVERY PROMPT THAT EVER WON A WINDOW
+            </span>
+          </div>
 
-        {runs === null && (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            The gallery is unavailable right now. Try again in a bit.
-          </p>
-        )}
+          {/* search */}
+          <form action="/gallery" method="get" className="flex gap-2">
+            <input
+              type="search"
+              name="q"
+              defaultValue={q}
+              placeholder="search past prompts..."
+              className="w-full rounded-[10px] border border-noir-border-strong bg-noir-bg px-4 py-2.5 font-mono-space text-[13px] text-noir-text caret-noir-red outline-none placeholder:text-noir-muted focus:border-noir-red"
+            />
+            <button
+              type="submit"
+              className="shrink-0 cursor-pointer rounded-[10px] border-2 border-noir-bg bg-noir-red px-5 font-bebas text-base tracking-[2px] text-noir-bg shadow-[0_0_0_2px_#35353a,0_4px_0_#000] active:translate-y-[2px] active:shadow-[0_0_0_2px_#35353a,0_2px_0_#000]"
+            >
+              SEARCH
+            </button>
+          </form>
 
-        {runs !== null && runs.length === 0 && (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {q
-              ? "No runs match that search."
-              : "Nothing here yet. The first window hasn't been won — maybe you'll be the one."}
-          </p>
-        )}
-
-        <ul className="flex flex-col gap-4">
-          {runs?.map((run) => (
-            <li key={run.id}>
+          {q && runs !== null && (
+            <p className="font-mono-space text-[10px] text-noir-faint">
+              {runs.length}
+              {runs.length === 50 ? "+" : ""} result
+              {runs.length === 1 ? "" : "s"} for &ldquo;{q}&rdquo; ·{" "}
               <Link
-                href={`/runs/${run.id}`}
-                className="block rounded-2xl border border-black/[.08] dark:border-white/[.145] bg-white dark:bg-zinc-950 p-5 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600"
+                href="/gallery"
+                className="text-noir-red underline underline-offset-2"
               >
-                <p className="text-sm font-medium leading-6 text-zinc-900 dark:text-zinc-100 line-clamp-2">
-                  &ldquo;{run.prompt}&rdquo;
-                </p>
-                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  {new Date(run.created_at).toUTCString()}
-                  {" · "}
-                  {run.responses?.[0]?.count ?? 0} responses
-                  {run.wants_credit && run.submitter_handle && (
-                    <> · by @{run.submitter_handle}</>
-                  )}
-                </p>
+                clear
               </Link>
-            </li>
-          ))}
-        </ul>
+            </p>
+          )}
+
+          {runs === null && (
+            <p className="font-mono-space text-[11px] text-noir-muted">
+              the gallery is unavailable right now. try again in a bit.
+            </p>
+          )}
+
+          {runs !== null && runs.length === 0 && (
+            <p className="font-mono-space text-[11px] text-noir-muted">
+              {q
+                ? "no runs match that search."
+                : "nothing here yet. the first window hasn't been won — maybe you'll be the one."}
+            </p>
+          )}
+
+          <ul className="flex flex-col gap-[10px]">
+            {runs?.map((run) => (
+              <li key={run.id}>
+                <Link
+                  href={`/runs/${run.id}`}
+                  className="block rounded-[10px] border border-noir-border bg-noir-bg p-4 transition-colors hover:border-noir-border-strong"
+                >
+                  <p className="line-clamp-2 font-mono-space text-[13px] leading-[1.5] text-noir-text">
+                    &gt; &ldquo;{run.prompt}&rdquo;
+                  </p>
+                  <p className="mt-2 font-mono-space text-[9px] tracking-[1px] text-noir-faint">
+                    {new Date(run.created_at).toUTCString()}
+                    {" · "}
+                    {run.responses?.[0]?.count ?? 0} responses
+                    {run.wants_credit && run.submitter_handle && (
+                      <> · by @{run.submitter_handle}</>
+                    )}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex justify-center font-mono-space text-[10px] text-noir-faint">
+            <span>
+              a living log of how models handle normal prompts — not benchmarks
+            </span>
+          </div>
+        </div>
       </main>
     </div>
   );
