@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import GalleryModal from "./GalleryModal";
 
 const KNOB_FACE =
   "relative h-[74px] w-[74px] rounded-full border-2 border-noir-border-strong bg-noir-knob shadow-[0_5px_0_#000]";
@@ -22,6 +25,8 @@ export default function KnobRail({
   howOpen: boolean;
   onToggleHow: () => void;
 }) {
+  const [galleryOpen, setGalleryOpen] = useState(false);
+
   return (
     <div className="flex flex-wrap items-start justify-center gap-x-11 gap-y-5 pb-1 pt-2">
       <div className="flex flex-col items-center gap-[9px]">
@@ -43,11 +48,23 @@ export default function KnobRail({
       </div>
 
       <div className="flex flex-col items-center gap-[9px]">
-        <Link href="/gallery" className={`${KNOB_FACE} ${WOBBLE} block`}>
-          <div className={`${INDICATOR} bg-noir-text`} style={spin(-45)} />
-        </Link>
+        {/* Wobble on the wrapper so it doesn't fight the spring rotation */}
+        <div className={WOBBLE}>
+          <button
+            type="button"
+            onClick={() => setGalleryOpen((v) => !v)}
+            aria-haspopup="dialog"
+            aria-expanded={galleryOpen}
+            className={`${KNOB_FACE} block cursor-pointer transition-transform duration-[.35s] ease-[cubic-bezier(.34,1.56,.64,1)]`}
+            style={{ transform: `rotate(${galleryOpen ? 50 : -45}deg)` }}
+          >
+            <div className={`${INDICATOR} bg-noir-text`} />
+          </button>
+        </div>
         <span className={`${LABEL} text-noir-text`}>GALLERY</span>
       </div>
+
+      {galleryOpen && <GalleryModal onClose={() => setGalleryOpen(false)} />}
 
       <div className="flex flex-col items-center gap-[9px]">
         <a
