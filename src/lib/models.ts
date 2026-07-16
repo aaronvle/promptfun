@@ -8,7 +8,7 @@ export const MODELS: { slug: string; label: string }[] = [
   { slug: "meta-llama/llama-4-maverick", label: "Llama" },
   { slug: "deepseek/deepseek-v4-pro", label: "DeepSeek" },
   { slug: "x-ai/grok-4.20", label: "Grok" },
-  { slug: "mistralai/mistral-large-2512", label: "Mistral" },
+  { slug: "moonshotai/kimi-k2.6", label: "Kimi" },
   { slug: "z-ai/glm-5.2", label: "GLM" },
 ];
 
@@ -20,6 +20,7 @@ const LEGACY_LABELS: Record<string, string> = {
   "google/gemini-3-pro-preview": "Gemini",
   "deepseek/deepseek-chat-v3.1": "DeepSeek",
   "x-ai/grok-4": "Grok",
+  "mistralai/mistral-large-2512": "Mistral",
 };
 
 export function labelFor(slug: string): string {
