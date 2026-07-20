@@ -6,8 +6,9 @@ import type { LatestRun } from "@/lib/runs";
 import ScrambledClock from "./ScrambledClock";
 import Terminal, { type DisplayResponse } from "./Terminal";
 import SendButton from "./SendButton";
-import KnobRail from "./KnobRail";
+import KnobRail, { type PanelId } from "./KnobRail";
 import HowPanel from "./HowPanel";
+import RecentRunsList from "./RecentRunsList";
 import MeterStrip, { type MeterState } from "./MeterStrip";
 import LastRunPanel from "./LastRunPanel";
 
@@ -28,7 +29,7 @@ export default function Console({
   const [phase, setPhase] = useState<Phase>("closed");
   const [prompt, setPrompt] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
-  const [howOpen, setHowOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<PanelId | null>(null);
   // The run currently streaming in the terminal (ours or the winner's).
   const [run, setRun] = useState<LatestRun | null>(null);
   const [lastRun, setLastRun] = useState(initialLastRun);
@@ -197,9 +198,33 @@ export default function Console({
         </div>
       </div>
 
-      <KnobRail howOpen={howOpen} onToggleHow={() => setHowOpen((v) => !v)} />
-
-      {howOpen && <HowPanel />}
+      {/* channel selector: knobs on the left, active panel on the right */}
+      <div className="flex items-start gap-4 sm:gap-8">
+        <KnobRail
+          active={activePanel}
+          onSelect={(panel) =>
+            setActivePanel((prev) => (prev === panel ? null : panel))
+          }
+        />
+        <div className="min-w-0 flex-1 self-stretch">
+          {activePanel === "how" && <HowPanel />}
+          {activePanel === "gallery" && (
+            <div className="rounded-[10px] border border-noir-border bg-noir-bg p-4">
+              <p className="mb-3 font-bebas text-lg tracking-[2px] text-noir-text">
+                RECENT <span className="text-noir-red">RUNS</span>
+              </p>
+              <RecentRunsList />
+            </div>
+          )}
+          {!activePanel && (
+            <div className="flex h-full min-h-[180px] items-center justify-center rounded-[10px] border border-dashed border-noir-border">
+              <span className="font-mono-space text-[10px] tracking-[2px] text-noir-faint">
+                ◂ SELECT A CHANNEL
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
 
       <MeterStrip meters={meters} />
 
