@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
+import GalleryRunList from "@/components/noir/GalleryRunList";
 
 export const dynamic = "force-dynamic";
 
@@ -113,28 +114,18 @@ export default async function GalleryPage(props: PageProps<"/gallery">) {
             </p>
           )}
 
-          <ul className="flex flex-col gap-[10px]">
-            {runs?.map((run) => (
-              <li key={run.id}>
-                <Link
-                  href={`/runs/${run.id}`}
-                  className="block rounded-[10px] border border-noir-border bg-noir-bg p-4 transition-colors hover:border-noir-border-strong"
-                >
-                  <p className="line-clamp-2 font-mono-space text-[13px] leading-[1.5] text-noir-text">
-                    &gt; &ldquo;{run.prompt}&rdquo;
-                  </p>
-                  <p className="mt-2 font-mono-space text-[9px] tracking-[1px] text-noir-faint">
-                    {new Date(run.created_at).toUTCString()}
-                    {" · "}
-                    {run.responses?.[0]?.count ?? 0} responses
-                    {run.wants_credit && run.submitter_handle && (
-                      <> · by @{run.submitter_handle}</>
-                    )}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {runs && runs.length > 0 && (
+            <GalleryRunList
+              runs={runs.map((run) => ({
+                id: run.id,
+                prompt: run.prompt,
+                created_at: run.created_at,
+                submitter_handle: run.submitter_handle,
+                wants_credit: run.wants_credit,
+                responseCount: run.responses?.[0]?.count ?? 0,
+              }))}
+            />
+          )}
 
           <div className="flex justify-center font-mono-space text-[10px] text-noir-faint">
             <span>
