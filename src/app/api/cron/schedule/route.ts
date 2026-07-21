@@ -48,6 +48,12 @@ export async function GET(request: Request) {
     created.push(opensAt);
   }
 
+  // Housekeeping: rate-limit attempts older than a day are dead weight.
+  await db
+    .from("submit_attempts")
+    .delete()
+    .lt("attempted_at", new Date(now - 24 * 60 * 60 * 1000).toISOString());
+
   // Don't echo opens_at values anywhere a human might screenshot; count only.
   return Response.json({ scheduled: created.length });
 }

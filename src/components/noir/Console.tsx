@@ -98,6 +98,9 @@ export default function Console({
       } else if (error === "closed") {
         setPhase("closed");
         setNotice("the window slammed shut. wait for the next one.");
+      } else if (error === "rate_limited") {
+        setPhase("open");
+        setNotice("easy there · too many attempts, wait a minute");
       } else {
         setPhase("open");
         setNotice(`transmission failed (${error ?? "unknown"}) · try again`);

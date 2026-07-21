@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { getOpenWindow } from "@/lib/window";
 import { MODELS, PROMPT_MAX_LENGTH } from "@/lib/models";
 import { askModel } from "@/lib/openrouter";
+import { allowSubmit, clientIpHash } from "@/lib/rateLimit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Fan-out can take a while on slow models; give the function room.
@@ -21,19 +22,30 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid JSON" }, { status: 400 });
   }
 
-  const prompt = body.prompt?.trim() ?? "";
-  if (prompt.length === 0 || prompt.length > PROMPT_MAX_LENGTH) {
+  // Strip control characters (keep \n and \t), then validate length.
+  const prompt = (body.prompt ?? "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+    .trim();
+  if (prompt.length < 2 || prompt.length > PROMPT_MAX_LENGTH) {
     return Response.json(
-      { error: `prompt must be 1-${PROMPT_MAX_LENGTH} characters` },
+      { error: `prompt must be 2-${PROMPT_MAX_LENGTH} characters` },
       { status: 400 }
     );
   }
-  const handle = body.handle?.trim().replace(/^@/, "").slice(0, 30) || null;
+
+  // Only accept plausible X handles; anything else drops the credit.
+  const rawHandle = body.handle?.trim().replace(/^@/, "") ?? "";
+  const handle = /^[A-Za-z0-9_]{1,15}$/.test(rawHandle) ? rawHandle : null;
 
   let db;
   let win;
   try {
     db = supabaseAdmin();
+
+    if (!(await allowSubmit(db, clientIpHash(request)))) {
+      return Response.json({ error: "rate_limited" }, { status: 429 });
+    }
+
     win = await getOpenWindow(db);
   } catch {
     return Response.json({ error: "unavailable" }, { status: 500 });
