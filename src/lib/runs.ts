@@ -5,6 +5,8 @@ export interface RunResponse {
   output: string | null;
   error: string | null;
   latency_ms: number | null;
+  completion_tokens: number | null;
+  cost: number | null;
 }
 
 export interface LatestRun {
@@ -25,7 +27,7 @@ export async function getLatestRun(
   const { data, error } = await db
     .from("runs")
     .select(
-      "id, prompt, created_at, submitter_handle, wants_credit, responses(model, output, error, latency_ms)"
+      "id, prompt, created_at, submitter_handle, wants_credit, responses(model, output, error, latency_ms, completion_tokens, cost)"
     )
     .order("created_at", { ascending: false })
     .limit(1)

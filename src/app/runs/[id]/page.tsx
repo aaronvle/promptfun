@@ -10,6 +10,14 @@ interface ResponseRow {
   output: string | null;
   error: string | null;
   latency_ms: number | null;
+  completion_tokens: number | null;
+  cost: number | null;
+}
+
+// "$0.0031" for tiny amounts, "$0.03" once it's cents.
+function formatCost(cost: number): string {
+  if (cost < 0.00005) return "<$0.0001";
+  return cost >= 0.01 ? `$${cost.toFixed(2)}` : `$${cost.toFixed(4)}`;
 }
 
 
@@ -26,7 +34,7 @@ export default async function RunPage(props: PageProps<"/runs/[id]">) {
 
   const { data: responses } = await db
     .from("responses")
-    .select("model, output, error, latency_ms")
+    .select("model, output, error, latency_ms, completion_tokens, cost")
     .eq("run_id", id)
     .order("latency_ms", { ascending: true });
 
@@ -86,9 +94,11 @@ export default async function RunPage(props: PageProps<"/runs/[id]">) {
                 <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                   {labelFor(r.model)}
                 </h2>
-                <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+                <span className="text-right font-mono text-xs text-zinc-400 dark:text-zinc-500">
                   {r.model}
                   {r.latency_ms != null && ` · ${(r.latency_ms / 1000).toFixed(1)}s`}
+                  {r.completion_tokens != null && ` · ${r.completion_tokens} tok`}
+                  {r.cost != null && ` · ${formatCost(r.cost)}`}
                 </span>
               </header>
               {r.output ? (
