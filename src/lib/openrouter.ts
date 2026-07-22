@@ -2,9 +2,10 @@
 // https://openrouter.ai/docs
 
 const MODEL_TIMEOUT_MS = 45_000;
-// Cost control: a window winner gets real answers, not essays. Applied
-// per model, so a 7-model run costs at most ~7x this.
-const MAX_OUTPUT_TOKENS = 1024;
+// Cost ceiling per model per run. Reasoning models spend "thinking"
+// tokens from this same budget, so it must be much larger than the
+// visible answer — 1024 left Kimi/GLM/Gemini empty or cut off.
+const MAX_OUTPUT_TOKENS = 8192;
 
 export interface ModelResult {
   model: string;
@@ -50,6 +51,10 @@ export async function askModel(
         model: slug,
         messages: [{ role: "user", content: prompt }],
         max_tokens: MAX_OUTPUT_TOKENS,
+        // Keep thinking short so the budget goes to the visible answer
+        // and slow reasoners stay inside the timeout. OpenRouter drops
+        // this for models without reasoning support.
+        reasoning: { effort: "low" },
       }),
       signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
     });
@@ -62,8 +67,17 @@ export async function askModel(
       if (json.error) {
         error = `${json.error.code ?? ""} ${json.error.message ?? "provider error"}`.trim();
       } else {
-        output = json.choices?.[0]?.message?.content ?? null;
-        if (!output) error = "empty completion";
+        const choice = json.choices?.[0];
+        output = choice?.message?.content || null;
+        if (!output) {
+          // Distinguish "reasoned itself out of budget" from a true
+          // empty response so the archive tells us what happened.
+          error = choice?.message?.reasoning
+            ? "spent the whole token budget reasoning, no answer left"
+            : "empty completion";
+        } else if (choice?.finish_reason === "length") {
+          output += "\n\n*[cut off at the token limit]*";
+        }
       }
     }
   } catch (err) {
