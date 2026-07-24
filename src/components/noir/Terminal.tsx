@@ -9,6 +9,10 @@ export default function Terminal({
   pending,
   notice,
   onReset,
+  handle,
+  onHandleChange,
+  wantsCredit,
+  onWantsCreditChange,
 }: {
   phase: "closed" | "open" | "running" | "done";
   prompt: string;
@@ -18,6 +22,10 @@ export default function Terminal({
   pending: number;
   notice: string | null;
   onReset: () => void;
+  handle: string;
+  onHandleChange: (v: string) => void;
+  wantsCredit: boolean;
+  onWantsCreditChange: (v: boolean) => void;
 }) {
   const isRun = phase === "running" || phase === "done";
 
@@ -55,9 +63,31 @@ export default function Terminal({
             </span>
           </div>
           <div className="h-px bg-noir-border" />
-          <div className="font-mono-space text-[10px] text-noir-faint">
-            first prompt sent claims the run · everyone else watches
-          </div>
+          {phase === "open" ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <input
+                type="text"
+                value={handle}
+                onChange={(e) => onHandleChange(e.target.value)}
+                maxLength={16}
+                placeholder="@yourhandle (optional)"
+                className="w-[190px] rounded-[6px] border border-noir-border bg-transparent px-2.5 py-1.5 font-mono-space text-[11px] text-noir-text caret-noir-red outline-none placeholder:text-noir-faint focus:border-noir-border-strong"
+              />
+              <label className="flex cursor-pointer items-center gap-1.5 font-mono-space text-[10px] text-noir-muted">
+                <input
+                  type="checkbox"
+                  checked={wantsCredit}
+                  onChange={(e) => onWantsCreditChange(e.target.checked)}
+                  className="accent-[#c22f2f]"
+                />
+                tag me when this gets tweeted
+              </label>
+            </div>
+          ) : (
+            <div className="font-mono-space text-[10px] text-noir-faint">
+              first prompt sent claims the run · everyone else watches
+            </div>
+          )}
         </>
       ) : (
         <>
