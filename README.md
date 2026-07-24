@@ -64,6 +64,8 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 | `OPENROUTER_API_KEY` | server only | Model fan-out; without it, runs record an error per model |
 | `NEXT_PUBLIC_SITE_URL` | optional | Sent as `HTTP-Referer` app attribution to OpenRouter |
 | `CRON_SECRET` | server only | Protects `/api/cron/schedule` (Vercel sends it automatically) |
+| `X_API_KEY` / `X_API_SECRET` | server only | X app consumer keys (developer portal, paid posting tier) |
+| `X_ACCESS_TOKEN` / `X_ACCESS_SECRET` | server only | Bot account's OAuth 1.0a tokens; all four unset = bot disabled |
 
 The `windows` table has no public read policy on purpose: future opening
 times must never be readable from the client, or the game breaks.
