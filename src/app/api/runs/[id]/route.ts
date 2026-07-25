@@ -1,10 +1,10 @@
 import { supabaseAdmin } from "@/lib/supabase";
 
-// Truncated response previews for one run, fetched lazily when a
-// gallery row is expanded. Full text lives on the run page. Public
+// Responses for one run, fetched lazily when a gallery row is
+// expanded. Full text: the client collapses long answers visually so
+// "show more" can reveal the rest without another request. Public
 // data (responses has a public read policy). Static siblings like
 // /api/runs/latest take precedence over this dynamic segment.
-const PREVIEW_CHARS = 240;
 
 export async function GET(
   _req: Request,
@@ -24,11 +24,7 @@ export async function GET(
       model: r.model,
       latency_ms: r.latency_ms,
       error: r.error ? r.error.slice(0, 140) : null,
-      output: r.output
-        ? r.output.length > PREVIEW_CHARS
-          ? `${r.output.slice(0, PREVIEW_CHARS)}…`
-          : r.output
-        : null,
+      output: r.output,
     }));
 
     return Response.json(

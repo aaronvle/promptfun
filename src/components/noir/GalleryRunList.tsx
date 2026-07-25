@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { labelFor } from "@/lib/models";
 
 export interface GalleryRun {
@@ -20,9 +22,62 @@ interface PreviewResponse {
   latency_ms: number | null;
 }
 
+// Answers longer than this get visually collapsed with a "show more".
+const COLLAPSE_CHARS = 420;
+
+// One model's answer inside an expanded gallery row: markdown
+// rendered, collapsed to a fixed height with a fade when long.
+function AnswerPreview({ r }: { r: PreviewResponse }) {
+  const [showAll, setShowAll] = useState(false);
+  const long = (r.output?.length ?? 0) > COLLAPSE_CHARS;
+
+  return (
+    <div className="flex flex-col gap-1.5 py-3">
+      <p className="font-mono-space text-[12px] font-bold text-noir-red">
+        [{labelFor(r.model)}
+        {r.latency_ms != null && ` · ${(r.latency_ms / 1000).toFixed(1)}s`}]
+      </p>
+      {r.output ? (
+        <>
+          <div
+            className={`relative ${!showAll && long ? "max-h-44 overflow-hidden" : ""}`}
+          >
+            <div className="noir-markdown noir-markdown-lg">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {r.output}
+              </ReactMarkdown>
+            </div>
+            {!showAll && long && (
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-12"
+                style={{
+                  background: "linear-gradient(transparent, #0a0a0b)",
+                }}
+              />
+            )}
+          </div>
+          {long && (
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className="self-start cursor-pointer font-mono-space text-[11px] text-noir-red hover:underline"
+            >
+              {showAll ? "show less ▴" : "show more ▾"}
+            </button>
+          )}
+        </>
+      ) : (
+        <p className="font-mono-space text-[12px] text-noir-faint">
+          {r.error ?? "no output"}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // Expandable run rows for the gallery page: clicking a prompt drops
-// down truncated per-model previews (fetched lazily, cached per row);
-// the dedicated run page stays one click away.
+// down each model's answer (fetched lazily, cached per row); the
+// dedicated run page stays one click away.
 export default function GalleryRunList({ runs }: { runs: GalleryRun[] }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [previews, setPreviews] = useState<
@@ -89,9 +144,9 @@ export default function GalleryRunList({ runs }: { runs: GalleryRun[] }) {
             </button>
 
             {isOpen && (
-              <div className="mt-3 flex flex-col gap-1.5 border-t border-noir-border pt-3">
+              <div className="mt-3 border-t border-noir-border-strong/60 pt-1">
                 {preview === undefined && (
-                  <p className="font-mono-space text-[10px] text-noir-muted">
+                  <p className="py-2 font-mono-space text-[11px] text-noir-muted">
                     loading
                     <span className="motion-safe:animate-[pf-cursor_1s_steps(1)_infinite]">
                       _
@@ -99,33 +154,22 @@ export default function GalleryRunList({ runs }: { runs: GalleryRun[] }) {
                   </p>
                 )}
                 {preview === null && (
-                  <p className="font-mono-space text-[10px] text-noir-muted">
-                    couldn&apos;t load previews. try the full run.
+                  <p className="py-2 font-mono-space text-[11px] text-noir-muted">
+                    couldn&apos;t load responses. try the full run.
                   </p>
                 )}
-                {preview?.map((r) => (
-                  <p
-                    key={r.model}
-                    className="font-mono-space text-[11px] leading-[1.5] text-noir-body"
-                  >
-                    <span className="font-bold text-noir-red">
-                      [{labelFor(r.model)}
-                      {r.latency_ms != null &&
-                        ` ${(r.latency_ms / 1000).toFixed(1)}s`}
-                      ]
-                    </span>{" "}
-                    {r.output ?? (
-                      <span className="text-noir-faint">
-                        {r.error ?? "no output"}
-                      </span>
-                    )}
-                  </p>
-                ))}
+                {preview && (
+                  <div className="divide-y divide-noir-border-strong/60">
+                    {preview.map((r) => (
+                      <AnswerPreview key={r.model} r={r} />
+                    ))}
+                  </div>
+                )}
                 <Link
                   href={`/runs/${run.id}`}
-                  className="mt-1 self-start font-mono-space text-[11px] text-noir-red underline underline-offset-2"
+                  className="mt-2 inline-block font-mono-space text-[11px] text-noir-red underline underline-offset-2"
                 >
-                  full responses ▸
+                  full run page ▸
                 </Link>
               </div>
             )}

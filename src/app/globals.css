@@ -118,6 +118,12 @@
 }
 .noir-markdown th { color: var(--color-noir-text); }
 
+/* Larger variant for reading contexts (gallery previews). */
+.noir-markdown-lg {
+  font-size: 13px;
+  line-height: 1.65;
+}
+
 /* Noir homepage animations. All applied via motion-safe: so
    prefers-reduced-motion disables them wholesale. */
 @keyframes pf-blink {
