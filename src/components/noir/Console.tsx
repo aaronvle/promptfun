@@ -9,6 +9,7 @@ import ResponseCard, { type CardResponse } from "./ResponseCard";
 import SendButton from "./SendButton";
 import KnobRail from "./KnobRail";
 import HowPanel from "./HowPanel";
+import GalleryPanel from "./GalleryPanel";
 import MeterStrip, { type MeterState } from "./MeterStrip";
 import LastRunPanel from "./LastRunPanel";
 
@@ -26,6 +27,7 @@ export default function Console({
   const [prompt, setPrompt] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [howOpen, setHowOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   // The run currently streaming in the terminal (ours or the winner's).
   const [run, setRun] = useState<LatestRun | null>(null);
   const [lastRun, setLastRun] = useState(initialLastRun);
@@ -203,9 +205,22 @@ export default function Console({
         </div>
       )}
 
-      <KnobRail howOpen={howOpen} onToggleHow={() => setHowOpen((v) => !v)} />
+      <KnobRail
+        howOpen={howOpen}
+        onToggleHow={() => {
+          // One panel at a time: opening HOW closes GALLERY and vice versa.
+          setHowOpen((v) => !v);
+          setGalleryOpen(false);
+        }}
+        galleryOpen={galleryOpen}
+        onToggleGallery={() => {
+          setGalleryOpen((v) => !v);
+          setHowOpen(false);
+        }}
+      />
 
       {howOpen && <HowPanel />}
+      {galleryOpen && <GalleryPanel />}
 
       <MeterStrip meters={meters} />
 
