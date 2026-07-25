@@ -38,6 +38,8 @@ export default function LastRunPanel({ run }: { run: LatestRun }) {
                   : null,
               text: r.output ?? r.error ?? "no output",
               isError: !r.output,
+              tokens: r.completion_tokens,
+              cost: r.cost,
             }}
           />
         ))}

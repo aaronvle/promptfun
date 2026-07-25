@@ -89,6 +89,9 @@ async function fanOut(db: SupabaseClient, runId: string, prompt: string) {
         output: result.output,
         error: result.error,
         latency_ms: result.latency_ms,
+        prompt_tokens: result.prompt_tokens,
+        completion_tokens: result.completion_tokens,
+        cost: result.cost,
       });
     })
   );
