@@ -1,7 +1,9 @@
+import { after } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getOpenWindow } from "@/lib/window";
 import { MODELS, PROMPT_MAX_LENGTH } from "@/lib/models";
 import { askModel } from "@/lib/openrouter";
+import { postRunThread } from "@/lib/x";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Fan-out can take a while on slow models; give the function room.
@@ -73,6 +75,10 @@ export async function POST(request: Request) {
   }
 
   await fanOut(db, run.id, prompt);
+
+  // Tweet the completed run after the response is sent. No-op until
+  // the X_* env vars exist; never blocks or fails the submission.
+  after(() => postRunThread(db, run.id));
 
   return Response.json({ runId: run.id });
 }
