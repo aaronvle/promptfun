@@ -9,6 +9,8 @@ export default function Terminal({
   pending,
   notice,
   onReset,
+  handle,
+  onHandleChange,
 }: {
   phase: "closed" | "open" | "running" | "done";
   prompt: string;
@@ -18,6 +20,8 @@ export default function Terminal({
   pending: number;
   notice: string | null;
   onReset: () => void;
+  handle: string;
+  onHandleChange: (v: string) => void;
 }) {
   const isRun = phase === "running" || phase === "done";
 
@@ -55,9 +59,31 @@ export default function Terminal({
             </span>
           </div>
           <div className="h-px bg-noir-border" />
-          <div className="font-mono-space text-[10px] text-noir-faint">
-            first prompt sent claims the run · everyone else watches
-          </div>
+          {phase === "open" ? (
+            <div className="flex flex-col gap-1">
+              <label className="flex items-center gap-2 font-mono-space text-[10px] text-noir-muted">
+                <span className="whitespace-nowrap">
+                  𝕏 handle<span className="text-noir-faint"> (optional)</span>
+                </span>
+                <input
+                  type="text"
+                  value={handle}
+                  onChange={(e) => onHandleChange(e.target.value)}
+                  maxLength={16}
+                  placeholder="@yourname"
+                  className="w-[130px] rounded-[6px] border border-noir-border bg-transparent px-2.5 py-1.5 font-mono-space text-[11px] text-noir-text caret-noir-red outline-none placeholder:text-noir-faint focus:border-noir-border-strong"
+                />
+              </label>
+              <span className="font-mono-space text-[8px] tracking-[.5px] text-noir-faint">
+                by adding your username you consent to being credited and
+                tagged when this run is posted on 𝕏
+              </span>
+            </div>
+          ) : (
+            <div className="font-mono-space text-[10px] text-noir-faint">
+              first prompt sent claims the run · everyone else watches
+            </div>
+          )}
         </>
       ) : (
         <>
