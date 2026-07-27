@@ -65,14 +65,19 @@ export default function Terminal({
           <div className="h-px bg-noir-border" />
           {phase === "open" ? (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <input
-                type="text"
-                value={handle}
-                onChange={(e) => onHandleChange(e.target.value)}
-                maxLength={16}
-                placeholder="@yourhandle (optional)"
-                className="w-[190px] rounded-[6px] border border-noir-border bg-transparent px-2.5 py-1.5 font-mono-space text-[11px] text-noir-text caret-noir-red outline-none placeholder:text-noir-faint focus:border-noir-border-strong"
-              />
+              <label className="flex items-center gap-2 font-mono-space text-[10px] text-noir-muted">
+                <span className="whitespace-nowrap">
+                  𝕏 handle<span className="text-noir-faint"> (optional)</span>
+                </span>
+                <input
+                  type="text"
+                  value={handle}
+                  onChange={(e) => onHandleChange(e.target.value)}
+                  maxLength={16}
+                  placeholder="@yourname"
+                  className="w-[130px] rounded-[6px] border border-noir-border bg-transparent px-2.5 py-1.5 font-mono-space text-[11px] text-noir-text caret-noir-red outline-none placeholder:text-noir-faint focus:border-noir-border-strong"
+                />
+              </label>
               <label className="flex cursor-pointer items-center gap-1.5 font-mono-space text-[10px] text-noir-muted">
                 <input
                   type="checkbox"
@@ -80,7 +85,7 @@ export default function Terminal({
                   onChange={(e) => onWantsCreditChange(e.target.checked)}
                   className="accent-[#c22f2f]"
                 />
-                tag me when this gets tweeted
+                tag my 𝕏 account when this run is posted on 𝕏
               </label>
             </div>
           ) : (
