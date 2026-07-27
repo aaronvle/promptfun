@@ -11,8 +11,6 @@ export default function Terminal({
   onReset,
   handle,
   onHandleChange,
-  wantsCredit,
-  onWantsCreditChange,
 }: {
   phase: "closed" | "open" | "running" | "done";
   prompt: string;
@@ -24,8 +22,6 @@ export default function Terminal({
   onReset: () => void;
   handle: string;
   onHandleChange: (v: string) => void;
-  wantsCredit: boolean;
-  onWantsCreditChange: (v: boolean) => void;
 }) {
   const isRun = phase === "running" || phase === "done";
 
@@ -64,7 +60,7 @@ export default function Terminal({
           </div>
           <div className="h-px bg-noir-border" />
           {phase === "open" ? (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="flex flex-col gap-1">
               <label className="flex items-center gap-2 font-mono-space text-[10px] text-noir-muted">
                 <span className="whitespace-nowrap">
                   𝕏 handle<span className="text-noir-faint"> (optional)</span>
@@ -78,15 +74,10 @@ export default function Terminal({
                   className="w-[130px] rounded-[6px] border border-noir-border bg-transparent px-2.5 py-1.5 font-mono-space text-[11px] text-noir-text caret-noir-red outline-none placeholder:text-noir-faint focus:border-noir-border-strong"
                 />
               </label>
-              <label className="flex cursor-pointer items-center gap-1.5 font-mono-space text-[10px] text-noir-muted">
-                <input
-                  type="checkbox"
-                  checked={wantsCredit}
-                  onChange={(e) => onWantsCreditChange(e.target.checked)}
-                  className="accent-[#c22f2f]"
-                />
-                tag my 𝕏 account when this run is posted on 𝕏
-              </label>
+              <span className="font-mono-space text-[8px] tracking-[.5px] text-noir-faint">
+                by adding your username you consent to being credited and
+                tagged when this run is posted on 𝕏
+              </span>
             </div>
           ) : (
             <div className="font-mono-space text-[10px] text-noir-faint">

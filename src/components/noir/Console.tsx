@@ -25,7 +25,6 @@ export default function Console({
   const [phase, setPhase] = useState<Phase>("closed");
   const [prompt, setPrompt] = useState("");
   const [handle, setHandle] = useState("");
-  const [wantsCredit, setWantsCredit] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [howOpen, setHowOpen] = useState(false);
   // The run currently streaming in the terminal (ours or the winner's).
@@ -90,7 +89,12 @@ export default function Console({
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, handle, wantsCredit }),
+        // Typing a handle is the consent to be credited and tagged.
+        body: JSON.stringify({
+          prompt,
+          handle,
+          wantsCredit: handle.trim().length > 0,
+        }),
       });
       if (res.ok) return; // run polling has been streaming it in
       const { error } = await res.json();
@@ -189,8 +193,6 @@ export default function Console({
           onReset={reset}
           handle={handle}
           onHandleChange={setHandle}
-          wantsCredit={wantsCredit}
-          onWantsCreditChange={setWantsCredit}
         />
         <div className="flex items-center justify-center">
           <SendButton
