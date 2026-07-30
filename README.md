@@ -64,9 +64,20 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 | `OPENROUTER_API_KEY` | server only | Model fan-out; without it, runs record an error per model |
 | `NEXT_PUBLIC_SITE_URL` | optional | Sent as `HTTP-Referer` app attribution to OpenRouter |
 | `CRON_SECRET` | server only | Protects `/api/cron/schedule` (Vercel sends it automatically) |
+| `RATE_LIMIT_SALT` | optional | Salts hashed IPs in `submit_attempts`; any random string |
 
 The `windows` table has no public read policy on purpose: future opening
 times must never be readable from the client, or the game breaks.
+
+## Database migrations
+
+The schema lives in [`supabase/migrations/`](supabase/migrations/) as
+numbered SQL files — the source of truth for the database. There's no
+automated runner yet: apply new migrations by pasting them into the
+Supabase SQL editor (or `supabase db push` if you use the CLI). Applied
+so far: `0001` (initial schema). Pending for the rate limiter: `0002`
+(until it's applied, the limiter fails open and submissions work
+unguarded).
 
 ## Development
 
