@@ -26,9 +26,16 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
+  // Absolute base for og:image URLs; unfurlers require absolute links.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://promptfun-xi.vercel.app"
+  ),
   title: "promptfun",
   description:
     "One prompt. Every model. Once every 12 hours, at a random time — and only one person on the internet gets to write it.",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
