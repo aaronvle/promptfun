@@ -1,6 +1,8 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabase";
 import { MODELS, labelFor } from "@/lib/models";
+import { clipText } from "@/lib/og";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +12,28 @@ interface ResponseRow {
   output: string | null;
   error: string | null;
   latency_ms: number | null;
+}
+
+// Unfurl text alongside the share card: the prompt as the title.
+export async function generateMetadata(
+  props: PageProps<"/runs/[id]">
+): Promise<Metadata> {
+  const { id } = await props.params;
+  try {
+    const db = supabaseAdmin();
+    const { data } = await db
+      .from("runs")
+      .select("prompt")
+      .eq("id", id)
+      .single();
+    if (!data) return { title: "run — promptfun" };
+    return {
+      title: `“${clipText(data.prompt, 80)}” — promptfun`,
+      description: "one prompt · every model · see how each answered",
+    };
+  } catch {
+    return { title: "run — promptfun" };
+  }
 }
 
 
