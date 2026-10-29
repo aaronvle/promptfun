@@ -12,6 +12,9 @@ export interface ModelResult {
   output: string | null;
   error: string | null;
   latency_ms: number;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  cost: number | null; // USD, as accounted by OpenRouter
 }
 
 // Never throws: every failure mode becomes an error string on the
@@ -29,6 +32,9 @@ export async function askModel(
       output: null,
       error: "OPENROUTER_API_KEY not configured",
       latency_ms: 0,
+      prompt_tokens: null,
+      completion_tokens: null,
+      cost: null,
     };
   }
 
@@ -47,6 +53,11 @@ export async function askModel(
   // concrete model that served — store that so the archive stays
   // version-accurate as aliases roll forward.
   let servedModel: string | null = null;
+  let usage: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    cost?: number;
+  } | null = null;
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -59,6 +70,8 @@ export async function askModel(
         // and slow reasoners stay inside the timeout. OpenRouter drops
         // this for models without reasoning support.
         reasoning: { effort: "low" },
+        // Ask OpenRouter to account tokens and USD cost in the reply.
+        usage: { include: true },
       }),
       signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
     });
@@ -67,6 +80,7 @@ export async function askModel(
     } else {
       const json = await res.json();
       servedModel = typeof json.model === "string" ? json.model : null;
+      usage = json.usage ?? null;
       // OpenRouter can also surface upstream provider failures as an
       // error object on a 200 response.
       if (json.error) {
@@ -99,5 +113,8 @@ export async function askModel(
     output,
     error,
     latency_ms: Date.now() - started,
+    prompt_tokens: usage?.prompt_tokens ?? null,
+    completion_tokens: usage?.completion_tokens ?? null,
+    cost: usage?.cost ?? null,
   };
 }
