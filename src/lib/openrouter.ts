@@ -43,6 +43,10 @@ export async function askModel(
 
   let output: string | null = null;
   let error: string | null = null;
+  // With a ~latest alias slug, the reply's model field names the
+  // concrete model that served — store that so the archive stays
+  // version-accurate as aliases roll forward.
+  let servedModel: string | null = null;
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -62,6 +66,7 @@ export async function askModel(
       error = `OpenRouter ${res.status}: ${(await res.text()).slice(0, 300)}`;
     } else {
       const json = await res.json();
+      servedModel = typeof json.model === "string" ? json.model : null;
       // OpenRouter can also surface upstream provider failures as an
       // error object on a 200 response.
       if (json.error) {
@@ -89,5 +94,10 @@ export async function askModel(
           : "request failed";
   }
 
-  return { model: slug, output, error, latency_ms: Date.now() - started };
+  return {
+    model: servedModel ?? slug,
+    output,
+    error,
+    latency_ms: Date.now() - started,
+  };
 }

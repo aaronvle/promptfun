@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MODELS, PROMPT_MAX_LENGTH, labelFor } from "@/lib/models";
+import { MODELS, PROMPT_MAX_LENGTH, labelFor, authorOf } from "@/lib/models";
 import type { LatestRun } from "@/lib/runs";
 import ScrambledClock from "./ScrambledClock";
 import Terminal from "./Terminal";
@@ -144,11 +144,15 @@ export default function Console({
       isError: !r.output,
     }));
 
-  const answered = new Set((run?.responses ?? []).map((r) => r.model));
+  // Stored models are the concrete slugs that served; the lineup may
+  // hold ~latest aliases, so match meter to response by model author.
+  const answered = new Set(
+    (run?.responses ?? []).map((r) => authorOf(r.model))
+  );
   const meters = MODELS.map(({ slug, label }) => ({
     label,
     state: (isRun
-      ? answered.has(slug)
+      ? answered.has(authorOf(slug))
         ? "done"
         : phase === "running"
           ? "typing"
