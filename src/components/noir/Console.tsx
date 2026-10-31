@@ -142,6 +142,8 @@ export default function Console({
         r.latency_ms != null ? (r.latency_ms / 1000).toFixed(1) : null,
       text: r.output ?? r.error ?? "no output",
       isError: !r.output,
+      tokens: r.completion_tokens,
+      cost: r.cost,
     }));
 
   // Stored models are the concrete slugs that served; the lineup may
