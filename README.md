@@ -65,6 +65,13 @@ random timer fires ──▶ window opens ──▶ first user submits prompt
 | `NEXT_PUBLIC_SITE_URL` | optional | Sent as `HTTP-Referer` app attribution to OpenRouter |
 | `CRON_SECRET` | server only | Protects `/api/cron/schedule` (Vercel sends it automatically) |
 | `RATE_LIMIT_SALT` | optional | Salts hashed IPs in `submit_attempts`; any random string |
+| `MODERATION_MODEL` | optional | Judge for prompt screening (default `~google/gemini-flash-latest`) |
+
+Submitted prompts are screened by an LLM judge (via the same OpenRouter
+key) before the window is claimed: hate/harassment, sexual content,
+gore, doxxing, and crime-facilitation are blocked, since runs are
+public on the site and on X. The judge fails open on infrastructure
+errors; a blocked attempt leaves the window open for the next person.
 
 The `windows` table has no public read policy on purpose: future opening
 times must never be readable from the client, or the game breaks.
