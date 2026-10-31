@@ -109,6 +109,11 @@ export default function Console({
       } else if (error === "rate_limited") {
         setPhase("open");
         setNotice("easy there · too many attempts, wait a minute");
+      } else if (error === "blocked") {
+        setPhase("open");
+        setNotice(
+          "that prompt breaks the house rules · the window's still open, try another"
+        );
       } else {
         setPhase("open");
         setNotice(`transmission failed (${error ?? "unknown"}) · try again`);

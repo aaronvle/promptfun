@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { getOpenWindow } from "@/lib/window";
 import { MODELS, PROMPT_MAX_LENGTH } from "@/lib/models";
 import { askModel } from "@/lib/openrouter";
+import { screenPrompt } from "@/lib/moderation";
 import { allowSubmit, clientIpHash } from "@/lib/rateLimit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -52,6 +53,13 @@ export async function POST(request: Request) {
   }
   if (!win) {
     return Response.json({ error: "closed" }, { status: 409 });
+  }
+
+  // Screen BEFORE claiming: a blocked prompt burns only this attempt,
+  // the window stays open for everyone else. Runs are public (site,
+  // archive, X thread), so hate/sexual/gore/doxxing content stops here.
+  if ((await screenPrompt(prompt)) === "block") {
+    return Response.json({ error: "blocked" }, { status: 422 });
   }
 
   // Record the run first, then atomically claim the window for it. The
